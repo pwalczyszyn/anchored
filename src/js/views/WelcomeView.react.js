@@ -1,19 +1,23 @@
-var React = require('react');
-var DataActions = require('../actions/DataActions');
-var WelcomeView = React.createClass({
+import React from 'react';
+import DataActions from '../actions/DataActions';
 
-  onSignInClick: function () {
+class WelcomeView extends React.Component {
+
+  onSignInClick () {
     DataActions.signIn();
-  },
+  }
 
-  render: function() {
+  render() {
     return (
-      <div>
-        <button onClick={this.onSignInClick}>Sign In</button>
+      <div className="welcome-view">
+        <button className="pure-button" onClick={this.onSignInClick}>
+          <img src="img/basecamp.png" className="welcome-button__img"/>
+          <span className="welcome-button__label">Sign In to Basecamp</span>
+        </button>
       </div>
     );
   }
 
-});
+}
 
-module.exports = WelcomeView;
+export default WelcomeView;

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Simple Chrome Extension to handle links from project management services.",
   "scripts": {
-    "setup": "npm i -g gulp && npm i"
+    "setup": "npm i -g gulp bower && npm i && bower i"
   },
   "repository": {
     "type": "git",

@@ -1,9 +1,11 @@
 {
 	"manifest_version": 2,
 
-	"name": "4thbase",
-	"description": "Basecamp extension",
+	"name": "Anchored",
+	"description": "Simple Chrome Extension to handle links from project management services. This version supports only Basecamp but there is a plan to extend it in the future.",
 	"version": "1.0",
+
+	"author": "Piotr Walczyszyn",
 
 	"browser_action": {
 		"default_icon": "img/icon.png",

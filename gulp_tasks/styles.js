@@ -9,14 +9,14 @@ var autoprefixer = require('gulp-autoprefixer');
 var cssimport = require('gulp-cssimport');
 
 gulp.task('styles', function() {
-  var debug = process.env.NODE_ENV !== 'production';
-  var dest = debug ? 'build/Debug/css' : 'build/Release/css';
+	var debug = process.env.NODE_ENV !== 'production';
+	var dest = debug ? 'build/Debug/css' : 'build/Release/css';
 
 	return gulp.src('src/scss/*.scss')
 		.pipe(gulpif(debug, sourcemaps.init()))
 		.pipe(sass({
 			includePaths: [
-				'bower_components/modularized-normalize-scss'
+				'./bower_components/pure'
 			]
 		}))
 		.pipe(cssimport({

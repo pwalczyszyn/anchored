@@ -1,0 +1,20 @@
+.welcome-view {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: stretch;
+  align-items: center;
+}
+.welcome-button {
+  &__img {
+    width: 22px;
+    vertical-align: middle;
+  }
+  &__label {
+    vertical-align: middle;
+  }
+}
