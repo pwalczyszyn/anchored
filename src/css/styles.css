@@ -1,0 +1,132 @@
+body {
+  width: 230px;
+  height: 450px;
+  font-family: "ProximaNova","Helvetica Neue",helvetica,arial,sans-serif;
+}
+
+h4 {
+  margin: 10px 0 0;
+  padding-left: 10px;
+  color: #8E8E8E;
+  text-transform: uppercase;
+}
+
+.loader-view, .links-view, .error-view {
+  display: none;
+}
+
+.loader-view {
+  position: absolute;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-align-content: stretch;
+      -ms-flex-line-pack: stretch;
+          align-content: stretch;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.links-list {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.links-list li + li {
+  margin-top: 8px;
+}
+
+.links-list a  {
+  display: block;
+  color: #000;
+  text-decoration: none;
+  color: #4886BA;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topic-excerpt {
+  margin-top: 3px;
+  color: #B3B3B3;
+  font-weight: 300;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.container.syncing .sync-bar {
+  display: block;
+}
+.sync-bar {
+  position: absolute;
+  overflow: hidden;
+
+  display: none;
+
+  bottom: 0px;
+  left: 50%;
+  height: 2px;
+  -webkit-transform: translateX(-50%) translateY(-50%);
+      -ms-transform: translateX(-50%) translateY(-50%);
+          transform: translateX(-50%) translateY(-50%); /* ie9 hack */
+  -webkit-transform: translate3d(-50%, 0, 0);
+          transform: translate3d(-50%, 0, 0);
+
+  background-color: rgba(30, 30, 30, 0.2);
+
+  -webkit-animation: syncBarAnimation linear 3s;
+
+          animation: syncBarAnimation linear 3s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+
+  -webkit-animation: syncBarAnimation linear 3s;
+  -webkit-animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes syncBarAnimation {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 96%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes syncBarAnimation {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 96%;
+  }
+  100% {
+    width: 0;
+  }
+}

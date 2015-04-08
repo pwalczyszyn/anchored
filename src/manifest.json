@@ -1,0 +1,18 @@
+{
+	"manifest_version": 2,
+
+	"name": "4thbase",
+	"description": "Basecamp extension",
+	"version": "1.0",
+
+	"browser_action": {
+		"default_icon": "img/icon.png",
+		"default_popup": "index.html"
+	},
+
+	"permissions": [
+		"identity",
+		"https://launchpad.37signals.com/*",
+		"https://basecamp.com/*"
+	]
+}
