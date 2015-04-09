@@ -9,8 +9,9 @@ gulp.task('watch', function() {
 	gulp.watch('src/img/**', ['images']);
 	gulp.watch('src/scss/**/*.scss', ['styles']);
 	gulp.watch('src/index.html', ['html']);
-	gulp.watch('src/js/background.js', ['background-js']);
+	// gulp.watch('src/js/background.js', ['background-js']);
 
 	// Watch .js files
-	global.scripts(true);
+	global.scripts('app.js', true);
+	global.scripts('background.js', true);
 });

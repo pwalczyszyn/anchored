@@ -5,7 +5,7 @@ class WelcomeView extends React.Component {
 
   onSignInClick () {
     // DataActions.signIn();
-    chrome.extension.sendRequest({ msg: 'startFunc' });
+    chrome.extension.sendRequest({ msg: 'authBasecamp' });
   }
 
   onAuthorClick () {

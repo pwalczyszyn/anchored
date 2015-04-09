@@ -13,10 +13,11 @@
 	},
 
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["./js/background.js"]
   },
 
 	"permissions": [
+		"storage",
 		"identity",
 		"https://launchpad.37signals.com/*",
 		"https://basecamp.com/*"

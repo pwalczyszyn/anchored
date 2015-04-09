@@ -14,9 +14,9 @@ var source = require('vinyl-source-stream');
 var debug = process.env.NODE_ENV !== 'production';
 var dest = debug ? 'build/Debug/js' : 'build/Release/js';
 
-var scripts = global.scripts = function(watch) {
+var scripts = global.scripts = function(srcFile, watch) {
 	var bundler, rebundle;
-	bundler = browserify('./src/js/main.js', {
+	bundler = browserify('./src/js/' + srcFile, {
 		debug: debug,
 		cache: {}, // required for watchify
 		packageCache: {}, // required for watchify
@@ -33,11 +33,11 @@ var scripts = global.scripts = function(watch) {
 
 	rebundle = function() {
 
-		gutil.log(gutil.colors.magenta('Regenerated app.js'));
+		gutil.log(gutil.colors.magenta('Regenerated ' + srcFile));
 
 		return bundler.bundle()
 			.on('error', handleErrors)
-			.pipe(source('app.js'))
+			.pipe(source(srcFile))
 			.pipe(gulp.dest(dest));
 	};
 
@@ -47,14 +47,15 @@ var scripts = global.scripts = function(watch) {
 
 
 gulp.task('background-js', function() {
-	var debug = process.env.NODE_ENV !== 'production';
-	var dest = debug ? 'build/Debug' : 'build/Release';
-
-	// This one does nothing except moving the html file from src to www
-	return gulp.src('./src/js/background.js')
-		.pipe(gulp.dest(dest));
+	// var debug = process.env.NODE_ENV !== 'production';
+	// var dest = debug ? 'build/Debug' : 'build/Release';
+	//
+	// // This one does nothing except moving the html file from src to www
+	// return gulp.src('./src/js/background.js')
+	// 	.pipe(gulp.dest(dest));
+	return scripts('background.js', false);
 });
 
 gulp.task('scripts', ['background-js'], function() {
-	return scripts(false);
+	return scripts('app.js', false);
 });
