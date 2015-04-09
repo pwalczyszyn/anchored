@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "pure": "~0.6.0"
+    "pure": "~0.6.0",
+    "open-sans-fontface": "~1.4.0"
   }
 }
