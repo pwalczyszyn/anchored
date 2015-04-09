@@ -1,38 +1,64 @@
 import async from 'async';
 
-function authBasecamp() {
-  const CLIENT_ID = '3cbf3c792e29a8d347c014bedc0cbe51aad5ad12';
-  const REDIRECT_URL = chrome.identity.getRedirectURL('provider_cb');
-
-  chrome.identity.launchWebAuthFlow({
-      url: 'https://launchpad.37signals.com/authorization/new?type=user_agent&client_id=' +
-        CLIENT_ID + '&redirect_uri=' + REDIRECT_URL,
-      interactive: true
-    },
-    function(redirectUrl) {
-      var oauthData = {};
-      var splits = redirectUrl.split(/#|&/gi);
-      splits.forEach(function(s) {
-        if (s.indexOf('=') !== -1) {
-          var param = s.split('=');
-          oauthData[param[0]] = decodeURIComponent(param[1]);
-        }
-      });
-
-console.log('oauthData', oauthData);
-
-      if (oauthData.error !== undefined) {
-        // that.failed(oauthData);
-      } else {
-        // that.completed(oauthData);
-      }
-
-    }
-  );
-}
+var DataStore = require('./stores/DataStore');
+var DataActions = require('./actions/DataActions');
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-  if (request.msg === 'authBasecamp') {
-    authBasecamp();
-  }
+	if (request.msg === 'authBasecamp') {
+		DataActions.signIn();
+	}
 });
+
+function startSync() {
+  console.log('DataStore.getLastSyncTime()', DataStore.getLastSyncTime());
+	DataActions.sync(
+		DataStore.getLastSyncTime(),
+		DataStore.getOauthData()
+	);
+}
+
+DataStore.listen(function(status) {
+	console.log('DataStore status', status);
+
+	switch (status) {
+		case 'signedIn':
+
+			startSync();
+
+			break;
+		case 'sync_authorized':
+			chrome.browserAction.setBadgeBackgroundColor({
+				color: [0, 255, 0, 255]
+			});
+			chrome.browserAction.setBadgeText({
+				text: 'sync'
+			});
+			break;
+		case 'sync_completed':
+
+			var topics = DataStore.getTopics();
+			var newCount = topics.filter(function(topic) {
+				return topic.isNew;
+			}).length;
+
+			chrome.browserAction.setBadgeBackgroundColor({
+				color: [65, 105, 225, 255]
+			});
+			chrome.browserAction.setBadgeText({
+				text: newCount <= 0 ? '' : (newCount < 1000 ? String(newCount) : '999+')
+			});
+
+			break;
+		case 'sync_failed':
+			chrome.browserAction.setBadgeText({
+				text: ''
+			});
+			break;
+		default:
+
+	}
+});
+
+if (DataStore.isSignedIn()) {
+	startSync();
+}

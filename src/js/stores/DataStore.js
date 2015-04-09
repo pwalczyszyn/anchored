@@ -48,11 +48,11 @@ var DataStore = Reflux.createStore({
     newTopics.sort(function (a, b) {
       var t1 = moment(a.updated_at);
       var t2 = moment(b.updated_at);
-      return t2.unix() - t1.unix();
+      return t2.valueOf() - t1.valueOf();
     });
 
     if (newTopics.length > 0) {
-      this.lastSyncTime = moment(newTopics[0].updated_at).unix();
+      this.lastSyncTime = moment(newTopics[0].updated_at).valueOf();
       localStorage.setItem('LAST_SYNC_TIME', this.lastSyncTime);
     }
 
@@ -108,7 +108,7 @@ var DataStore = Reflux.createStore({
     topics.sort(function (a, b) {
       var t1 = moment(a.updated_at);
       var t2 = moment(b.updated_at);
-      return t2.unix() - t1.unix();
+      return t2.valueOf() - t1.valueOf();
     });
 
     return topics;
