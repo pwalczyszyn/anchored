@@ -1,6 +1,7 @@
 @import "../../bower_components/pure/base-min.css";
 @import "../../bower_components/pure/buttons-min.css";
 
+@import "fonts";
 @import "welcome-view";
 
 body {
@@ -8,6 +9,7 @@ body {
   height: 450px;
   margin: 0;
   padding: 0;
+  font-size: 14px;
   font-family: "ProximaNova","Helvetica Neue",helvetica,arial,sans-serif;
 }
 
