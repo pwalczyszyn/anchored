@@ -1,11 +1,13 @@
 import React from 'react';
 import DataActions from '../actions/DataActions';
+import bgPort from '../utils/bgport';
 
 class WelcomeView extends React.Component {
 
   onSignInClick () {
-    // DataActions.signIn();
-    chrome.extension.sendRequest({ msg: 'authBasecamp' });
+    bgPort.postMessage({
+      action: 'authBasecamp'
+    });
   }
 
   onAuthorClick () {

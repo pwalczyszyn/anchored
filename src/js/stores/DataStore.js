@@ -17,35 +17,35 @@ var DataStore = Reflux.createStore({
 
   topics: null,
 
-  init: function () {
+  init: function() {
     this.oauthData = JSON.parse(localStorage.getItem('OAUTH_DATA'));
     this.lastSyncTime = Number(localStorage.getItem('LAST_SYNC_TIME'));
     this.topics = JSON.parse(localStorage.getItem('TOPICS')) || {};
   },
 
-  onSignIn: function () {
+  onSignIn: function() {
     this.trigger('signingIn');
   },
-  onSignInCompleted: function (oauthData) {
+  onSignInCompleted: function(oauthData) {
     this.setOauthData(oauthData);
     this.trigger('signedIn');
   },
-  onSignInFailed: function (oauthData) {
+  onSignInFailed: function(oauthData) {
     this.trigger('signInFailed', oauthData.error);
   },
 
-  onSync: function () {
+  onSync: function() {
     debug('Sync started...');
   },
-  onSyncAuthorized: function (authData) {
+  onSyncAuthorized: function(authData) {
     this.oauthData.expires_at = authData.expires_at;
     this.setOauthData(this.oauthData);
     this.trigger('sync_authorized');
   },
-  onSyncCompleted: function (newTopics) {
+  onSyncCompleted: function(newTopics) {
     var newTopicsById = {};
 
-    newTopics.sort(function (a, b) {
+    newTopics.sort(function(a, b) {
       var t1 = moment(a.updated_at);
       var t2 = moment(b.updated_at);
       return t2.valueOf() - t1.valueOf();
@@ -56,7 +56,7 @@ var DataStore = Reflux.createStore({
       localStorage.setItem('LAST_SYNC_TIME', this.lastSyncTime);
     }
 
-    for(var i = newTopics.length - 1, topic; i >= 0; i--) {
+    for (var i = newTopics.length - 1, topic; i >= 0; i--) {
       topic = newTopics[i];
       newTopicsById[topic.topicable_id] = topic;
     }
@@ -67,7 +67,9 @@ var DataStore = Reflux.createStore({
     }
 
     // Mergin old and new topics
-    this.topics = update(this.topics, {$merge: newTopicsById});
+    this.topics = update(this.topics, {
+      $merge: newTopicsById
+    });
 
     // Storing topics
     localStorage.setItem('TOPICS', JSON.stringify(this.topics));
@@ -76,36 +78,36 @@ var DataStore = Reflux.createStore({
 
     debug('Sync completed!');
   },
-  onSyncFailed: function (err) {
+  onSyncFailed: function(err) {
     debug('onSyncFailed', err);
     this.trigger('sync_failed');
   },
 
-  setOauthData: function (oauthData) {
+  setOauthData: function(oauthData) {
     this.oauthData = oauthData;
     localStorage.setItem('OAUTH_DATA', JSON.stringify(oauthData));
   },
 
-  getOauthData: function () {
+  getOauthData: function() {
     return this.oauthData;
   },
 
-  isSignedIn: function () {
+  isSignedIn: function() {
     return this.oauthData !== null && !moment(this.oauthData.expires_at).isBefore();
   },
 
-  getLastSyncTime: function () {
+  getLastSyncTime: function() {
     return new Date(this.lastSyncTime);
   },
 
-  getTopics: function () {
+  getTopics: function() {
     var topics = [];
 
-    for (var topicable_id in this.topics) {
-      topics.push(this.topics[topicable_id]);
+    for (var topicableId in this.topics) {
+      topics.push(this.topics[topicableId]);
     }
 
-    topics.sort(function (a, b) {
+    topics.sort(function(a, b) {
       var t1 = moment(a.updated_at);
       var t2 = moment(b.updated_at);
       return t2.valueOf() - t1.valueOf();

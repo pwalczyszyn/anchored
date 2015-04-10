@@ -1,6 +1,11 @@
 'use strict';
 
-var React = require('react');
+import React from 'react';
 
-var MainView = require('./views/MainView.react');
-React.render(React.createElement(MainView), document.getElementById('container'));
+import MainView from './views/MainView.react';
+
+// Initializing communication with bg script
+import bgPort from './utils/bgport';
+
+let container = document.getElementById('container');
+React.render(React.createElement(MainView), container);
