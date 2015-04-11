@@ -9,112 +9,122 @@ var update = React.addons.update;
 
 var DataStore = Reflux.createStore({
 
-  listenables: [DataActions],
+	listenables: [DataActions],
 
-  oauthData: null,
+	oauthData: null,
 
-  lastSyncTime: null,
+	lastSyncTime: null,
 
-  topics: null,
+	topics: null,
 
-  init: function() {
-    this.oauthData = JSON.parse(localStorage.getItem('OAUTH_DATA'));
-    this.lastSyncTime = Number(localStorage.getItem('LAST_SYNC_TIME'));
-    this.topics = JSON.parse(localStorage.getItem('TOPICS')) || {};
-  },
+	init: function() {
+		this.oauthData = JSON.parse(localStorage.getItem('OAUTH_DATA'));
+		this.lastSyncTime = Number(localStorage.getItem('LAST_SYNC_TIME'));
+		this.topics = JSON.parse(localStorage.getItem('TOPICS')) || {};
+	},
 
-  onSignIn: function() {
-    this.trigger('signingIn');
-  },
-  onSignInCompleted: function(oauthData) {
-    this.setOauthData(oauthData);
-    this.trigger('signedIn');
-  },
-  onSignInFailed: function(oauthData) {
-    this.trigger('signInFailed', oauthData.error);
-  },
+	onSignIn: function() {
+		this.trigger('signingIn');
+	},
+	onSignInCompleted: function(oauthData) {
+		this.setOauthData(oauthData);
+		this.trigger('signedIn');
+	},
+	onSignInFailed: function(oauthData) {
+		this.trigger('signInFailed', oauthData.error);
+	},
 
-  onSync: function() {
-    debug('Sync started...');
-  },
-  onSyncAuthorized: function(authData) {
-    this.oauthData.expires_at = authData.expires_at;
-    this.setOauthData(this.oauthData);
-    this.trigger('sync_authorized');
-  },
-  onSyncCompleted: function(newTopics) {
-    var newTopicsById = {};
+	onSync: function() {
+		debug('Sync started...');
+	},
+	onSyncAuthorized: function(authData) {
+		this.oauthData.expires_at = authData.expires_at;
+		this.setOauthData(this.oauthData);
+		this.trigger('sync_authorized');
+	},
+	onSyncCompleted: function(newTopics) {
+		var newTopicsById = {};
 
-    newTopics.sort(function(a, b) {
-      var t1 = moment(a.updated_at);
-      var t2 = moment(b.updated_at);
-      return t2.valueOf() - t1.valueOf();
-    });
+		newTopics.sort(function(a, b) {
+			var t1 = moment(a.updated_at);
+			var t2 = moment(b.updated_at);
+			return t2.valueOf() - t1.valueOf();
+		});
 
-    if (newTopics.length > 0) {
-      this.lastSyncTime = moment(newTopics[0].updated_at).valueOf();
-      localStorage.setItem('LAST_SYNC_TIME', this.lastSyncTime);
-    }
+		if (newTopics.length > 0) {
+			this.lastSyncTime = moment(newTopics[0].updated_at).valueOf();
+			localStorage.setItem('LAST_SYNC_TIME', this.lastSyncTime);
+		}
 
-    for (var i = newTopics.length - 1, topic; i >= 0; i--) {
-      topic = newTopics[i];
-      newTopicsById[topic.topicable_id] = topic;
-    }
+		for (var i = newTopics.length - 1, topic; i >= 0; i--) {
+			topic = newTopics[i];
+			newTopicsById[topic.topicable_id] = topic;
+		}
 
-    // Setting existing topics as old
-    for (var topicable_id in this.topics) {
-      this.topics[topicable_id].isNew = false;
-    }
+		// Mergin old and new topics
+		this.topics = update(this.topics, {
+			$merge: newTopicsById
+		});
 
-    // Mergin old and new topics
-    this.topics = update(this.topics, {
-      $merge: newTopicsById
-    });
+		this.storeTopics();
 
-    // Storing topics
-    localStorage.setItem('TOPICS', JSON.stringify(this.topics));
+		this.trigger('sync_completed');
 
-    this.trigger('sync_completed');
+		debug('Sync completed!');
+	},
+	onSyncFailed: function(err) {
+		debug('onSyncFailed', err);
+		this.trigger('sync_failed');
+	},
 
-    debug('Sync completed!');
-  },
-  onSyncFailed: function(err) {
-    debug('onSyncFailed', err);
-    this.trigger('sync_failed');
-  },
+	onMarkAsSeen: function() {
 
-  setOauthData: function(oauthData) {
-    this.oauthData = oauthData;
-    localStorage.setItem('OAUTH_DATA', JSON.stringify(oauthData));
-  },
+		// Setting existing topics as seen
+		for (var topicableId in this.topics) {
+			this.topics[topicableId].wasSeen = true;
+		}
 
-  getOauthData: function() {
-    return this.oauthData;
-  },
+		this.storeTopics();
 
-  isSignedIn: function() {
-    return this.oauthData !== null && !moment(this.oauthData.expires_at).isBefore();
-  },
+		this.trigger('marked_as_seen');
+	},
 
-  getLastSyncTime: function() {
-    return new Date(this.lastSyncTime);
-  },
+	storeTopics: function() {
+		// Storing topics
+		localStorage.setItem('TOPICS', JSON.stringify(this.topics));
+	},
+	setOauthData: function(oauthData) {
+		this.oauthData = oauthData;
+		localStorage.setItem('OAUTH_DATA', JSON.stringify(oauthData));
+	},
 
-  getTopics: function() {
-    var topics = [];
+	getOauthData: function() {
+		return this.oauthData;
+	},
 
-    for (var topicableId in this.topics) {
-      topics.push(this.topics[topicableId]);
-    }
+	isSignedIn: function() {
+		return this.oauthData !== null && !moment(this.oauthData.expires_at).isBefore();
+	},
 
-    topics.sort(function(a, b) {
-      var t1 = moment(a.updated_at);
-      var t2 = moment(b.updated_at);
-      return t2.valueOf() - t1.valueOf();
-    });
+	getLastSyncTime: function() {
+		return new Date(this.lastSyncTime);
+	},
 
-    return topics;
-  }
+	getTopics: function() {
+		var topics = [];
+
+		for (var topicableId in this.topics) {
+			topics.push(this.topics[topicableId]);
+		}
+
+		topics.sort(function(a, b) {
+			var t1 = moment(a.updated_at);
+			var t2 = moment(b.updated_at);
+			return t2.valueOf() - t1.valueOf();
+		});
+
+		return topics;
+	}
 
 });
 

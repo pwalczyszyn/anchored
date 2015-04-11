@@ -13,7 +13,8 @@ const DataActions = Reflux.createActions({
 	sync: {
 		asyncResult: true,
 		children: ['authorized']
-	}
+	},
+	markAsSeen: {}
 });
 
 DataActions.signIn.listen(function() {
@@ -121,7 +122,7 @@ function loadLatest(since, userAccounts, oauthData, callback) {
 			updated_at: topic.updated_at,
 			topicable: topic.topicable,
 			source: 'basecamp',
-			isNew: true
+			wasSeen: false
 		};
 	}
 

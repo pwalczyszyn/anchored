@@ -1,0 +1,54 @@
+.topics-list {
+
+  padding: 0;
+  margin: 10px 10px 0 0;
+
+  &__item {
+    position: relative;
+
+    margin-top: 1px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    padding-left: 10px;
+
+    &-seen {
+      &:before {
+        display: block;
+        position: absolute;
+        content: '';
+        width: 5px;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgb(194, 209, 255);
+      }
+    }
+  }
+
+  &__link {
+    display: block;
+    color: #000;
+    text-decoration: none;
+    color: #4886BA;
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    outline: none;
+  }
+
+  &__excerpt {
+    margin-top: 3px;
+    color: #B3B3B3;
+    font-weight: 300;
+    font-size: 12px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}

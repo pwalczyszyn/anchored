@@ -7,81 +7,87 @@ var isPopupOpened = false;
 
 chrome.runtime.onConnect.addListener(function(port) {
 
-  if (port.name === 'popup_opened') {
+	if (port.name === 'popup_opened') {
 
-    isPopupOpened = true;
+		isPopupOpened = true;
 
-    port.onDisconnect.addListener(function() {
-      chrome.browserAction.setBadgeText({
-        text: ''
-      });
-      isPopupOpened = false;
-    });
+		port.onDisconnect.addListener(function() {
+
+			// Flagging that popup is closed
+			isPopupOpened = false;
+
+			// Clearing icon badge
+			chrome.browserAction.setBadgeText({
+				text: ''
+			});
+
+			// Marking all topics as seen
+			DataActions.markAsSeen();
+
+		});
 
 		port.onMessage.addListener(function(msg) {
 			if (msg.action === 'authBasecamp') {
-		    DataActions.signIn();
-		  }
+
+				DataActions.signIn();
+
+			}
 		});
 
-  }
+	}
 
-});
-
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 });
 
 function startSync() {
-  console.log('DataStore.getLastSyncTime()', DataStore.getLastSyncTime());
-  DataActions.sync(
-    DataStore.getLastSyncTime(),
-    DataStore.getOauthData()
-  );
+	DataActions.sync(
+		DataStore.getLastSyncTime(),
+		DataStore.getOauthData()
+	);
 }
 
 DataStore.listen(function(status) {
-  console.log('DataStore status', status);
+	console.log('DataStore status', status);
 
-  switch (status) {
-    case 'signedIn':
+	switch (status) {
+		case 'signedIn':
 
-      startSync();
+			startSync();
 
-      break;
-    case 'sync_authorized':
-      chrome.browserAction.setBadgeBackgroundColor({
-        color: [0, 255, 0, 255]
-      });
-      chrome.browserAction.setBadgeText({
-        text: 'sync'
-      });
-      break;
-    case 'sync_completed':
+			break;
+		case 'sync_authorized':
+			chrome.browserAction.setBadgeBackgroundColor({
+				color: [0, 255, 0, 255]
+			});
+			chrome.browserAction.setBadgeText({
+				text: 'sync'
+			});
+			break;
+		case 'sync_completed':
 
-      var topics = DataStore.getTopics();
-      var newCount = topics.filter(function(topic) {
-        return topic.isNew;
-      }).length;
+			var topics = DataStore.getTopics();
+			var newCount = topics.filter(function(topic) {
+				return topic.wasSeen;
+			}).length;
 
-      chrome.browserAction.setBadgeBackgroundColor({
-        color: [65, 105, 225, 255]
-      });
-      chrome.browserAction.setBadgeText({
-        text: newCount <= 0 ? '' : (newCount < 1000 ? String(newCount) :
-          '999+')
-      });
+			chrome.browserAction.setBadgeBackgroundColor({
+				color: [65, 105, 225, 255]
+			});
+			chrome.browserAction.setBadgeText({
+				text: newCount <= 0 ? '' : (newCount < 1000 ? String(newCount) :
+					'999+')
+			});
 
-      break;
-    case 'sync_failed':
-      chrome.browserAction.setBadgeText({
-        text: ''
-      });
-      break;
-    default:
+			break;
+		case 'sync_failed':
+			chrome.browserAction.setBadgeText({
+				text: ''
+			});
+			break;
+		default:
 
-  }
+	}
 });
 
 if (DataStore.isSignedIn()) {
-  startSync();
+	startSync();
 }
