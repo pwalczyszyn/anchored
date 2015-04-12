@@ -4,6 +4,8 @@ let DataStore = require('./stores/DataStore');
 let DataActions = require('./actions/DataActions');
 
 var isPopupOpened = false;
+var isSyncRunning = false;
+var timer;
 
 chrome.runtime.onConnect.addListener(function(port) {
 
@@ -39,6 +41,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 });
 
 function startSync() {
+  isSyncRunning = true;
 	DataActions.sync(
 		DataStore.getLastSyncTime(),
 		DataStore.getOauthData()
@@ -90,4 +93,9 @@ DataStore.listen(function(status) {
 
 if (DataStore.isSignedIn()) {
 	startSync();
+
+  timer = setTimeout(function () {
+    startSync();
+  }, 10 * 60 * 1000);
+
 }
