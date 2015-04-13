@@ -27,7 +27,7 @@ var MainView = React.createClass({
 
   onDataStoreChange: function (state) {
     switch (state) {
-      case 'signedIn':
+      case 'signin_completed':
 
         this.setState({
           signedIn: true

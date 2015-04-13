@@ -5,6 +5,8 @@ import debug from 'debug';
 
 import DataActions from '../actions/DataActions';
 
+let log = debug('DataStore');
+
 var update = React.addons.update;
 
 var DataStore = Reflux.createStore({
@@ -24,18 +26,21 @@ var DataStore = Reflux.createStore({
 	},
 
 	onSignIn: function() {
-		this.trigger('signingIn');
+		this.trigger('signin_started');
 	},
+
 	onSignInCompleted: function(oauthData) {
 		this.setOauthData(oauthData);
-		this.trigger('signedIn');
+		this.trigger('signin_completed');
 	},
+
 	onSignInFailed: function(oauthData) {
-		this.trigger('signInFailed', oauthData.error);
+		this.trigger('signin_failed', oauthData.error);
 	},
 
 	onSync: function() {
-		debug('Sync started...');
+		log('Sync started...');
+		this.trigger('sync_started');
 	},
 	onSyncAuthorized: function(authData) {
 		this.oauthData.expires_at = authData.expires_at;
@@ -72,9 +77,9 @@ var DataStore = Reflux.createStore({
 
 		debug('Sync completed!');
 	},
+
 	onSyncFailed: function(err) {
-		debug('onSyncFailed', err);
-		this.trigger('sync_failed');
+		this.trigger('sync_failed', err.message);
 	},
 
 	onMarkAsSeen: function() {
