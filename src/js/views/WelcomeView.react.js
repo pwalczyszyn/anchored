@@ -1,5 +1,5 @@
 import React from 'react';
-import DataActions from '../actions/DataActions';
+import BackgroundActions from '../actions/BackgroundActions';
 import bgPort from '../utils/bgport';
 
 class WelcomeView extends React.Component {

@@ -6,8 +6,8 @@ debug.enable('*');
 
 let log = debug('background');
 
-let DataStore = require('./stores/DataStore');
-let DataActions = require('./actions/DataActions');
+let BackgroundStore = require('./stores/BackgroundStore');
+let BackgroundActions = require('./actions/BackgroundActions');
 
 var port;
 var timer;
@@ -25,13 +25,13 @@ function popupClosed() {
 	});
 
 	// Marking all topics as seen
-	DataActions.markAsSeen();
+	BackgroundActions.markAsSeen();
 }
 
 function popupMessage(msg) {
 	if (msg.action === 'authBasecamp') {
 
-		DataActions.signIn();
+		BackgroundActions.signIn();
 
 	}
 }
@@ -63,9 +63,9 @@ function startSync(_isFirstSync) {
 	if (!isSyncRunning) {
 		isFirstSync = _isFirstSync || false;
 		isSyncRunning = true;
-		DataActions.sync(
-			DataStore.getLastSyncTime(),
-			DataStore.getOauthData()
+		BackgroundActions.sync(
+			BackgroundStore.getLastSyncTime(),
+			BackgroundStore.getOauthData()
 		);
 
 		if (port) {
@@ -80,8 +80,8 @@ function startSync(_isFirstSync) {
 
 
 
-DataStore.listen(function(status, errorMessage) {
-	log('DataStore status', status);
+BackgroundStore.listen(function(status, errorMessage) {
+	log('BackgroundStore status', status);
 
 	switch (status) {
 		case 'signin_completed':
@@ -105,7 +105,7 @@ DataStore.listen(function(status, errorMessage) {
 			break;
 		case 'sync_completed':
 
-			var topics = DataStore.getTopics();
+			var topics = BackgroundStore.getTopics();
 			var newCount = topics.filter(function(topic) {
 				return !topic.wasSeen;
 			}).length;
@@ -131,7 +131,7 @@ DataStore.listen(function(status, errorMessage) {
 	}
 });
 
-if (DataStore.isSignedIn()) {
+if (BackgroundStore.isSignedIn()) {
 
 	// Starting sync
 	startSync(false);

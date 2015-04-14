@@ -7,25 +7,23 @@ import LinksView from './LinksView.react';
 var LoaderView = require('./LoaderView.react');
 var WelcomeView = require('./WelcomeView.react');
 
-var DataStore = require('../stores/DataStore');
-var DataActions = require('../actions/DataActions');
+var BackgroundStore = require('../stores/BackgroundStore');
 
 var MainView = React.createClass({
 
   mixins: [Reflux.ListenerMixin],
 
   getInitialState: function() {
-
     return {
-      signedIn: DataStore.isSignedIn()
+      signedIn: BackgroundStore.isSignedIn()
     };
   },
 
   componentDidMount: function() {
-    this.listenTo(DataStore, this.onDataStoreChange);
+    this.listenTo(BackgroundStore, this.onBackgroundStoreChange);
   },
 
-  onDataStoreChange: function (state) {
+  onBackgroundStoreChange: function (state) {
     switch (state) {
       case 'signin_completed':
 

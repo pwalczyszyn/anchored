@@ -6,7 +6,7 @@ import async from 'async';
 const CLIENT_ID = '3cbf3c792e29a8d347c014bedc0cbe51aad5ad12';
 const REDIRECT_URL = chrome.identity.getRedirectURL('provider_cb');
 
-const DataActions = Reflux.createActions({
+const BackgroundActions = Reflux.createActions({
 	signIn: {
 		asyncResult: true
 	},
@@ -17,7 +17,7 @@ const DataActions = Reflux.createActions({
 	markAsSeen: {}
 });
 
-DataActions.signIn.listen(function() {
+BackgroundActions.signIn.listen(function() {
 	var that = this;
 
 	chrome.identity.launchWebAuthFlow({
@@ -277,7 +277,7 @@ function loadLatest(since, userAccounts, oauthData, callback) {
 	});
 }
 
-DataActions.sync.listen(function(since, oauthData) {
+BackgroundActions.sync.listen(function(since, oauthData) {
 	var that = this;
 
 	async.waterfall([
@@ -322,4 +322,4 @@ DataActions.sync.listen(function(since, oauthData) {
 });
 
 
-export default DataActions;
+export default BackgroundActions;

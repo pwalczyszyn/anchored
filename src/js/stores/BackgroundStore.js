@@ -3,15 +3,15 @@ import Reflux from 'reflux';
 import moment from 'moment';
 import debug from 'debug';
 
-import DataActions from '../actions/DataActions';
+import BackgroundActions from '../actions/BackgroundActions';
 
-let log = debug('DataStore');
+let log = debug('BackgroundStore');
 
 let update = React.addons.update;
 
-let DataStore = Reflux.createStore({
+let BackgroundStore = Reflux.createStore({
 
-	listenables: [DataActions],
+	listenables: [BackgroundActions],
 
 	oauthData: null,
 
@@ -183,4 +183,4 @@ let DataStore = Reflux.createStore({
 
 });
 
-export default DataStore;
+export default BackgroundStore;

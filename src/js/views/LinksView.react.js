@@ -2,8 +2,8 @@ import React from 'react';
 
 import classNames from 'classnames';
 
-import DataStore from '../stores/DataStore';
-import DataActions from '../actions/DataActions';
+import BackgroundStore from '../stores/BackgroundStore';
+import BackgroundActions from '../actions/BackgroundActions';
 
 class TopicItemRenderer extends React.Component {
 
@@ -36,7 +36,7 @@ class LinksView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      topics: DataStore.getTopics()
+      topics: BackgroundStore.getTopics()
     };
   }
 
@@ -44,24 +44,24 @@ class LinksView extends React.Component {
   }
 
   componentDidMount() {
-    DataActions.sync(
-      DataStore.getLastSyncTime(),
-      DataStore.getOauthData()
+    BackgroundActions.sync(
+      BackgroundStore.getLastSyncTime(),
+      BackgroundStore.getOauthData()
     );
-    this.unsubscribe = DataStore.listen(this.onDataStoreChange.bind(this));
+    this.unsubscribe = BackgroundStore.listen(this.onBackgroundStoreChange.bind(this));
   }
 
   componentWillUnmount() {
     this.unsubscribe();
   }
 
-  onDataStoreChange(state) {
+  onBackgroundStoreChange(state) {
 
     switch (state) {
       case 'sync_completed':
 
         this.setState({
-          topics: DataStore.getTopics()
+          topics: BackgroundStore.getTopics()
         });
 
         break;
