@@ -7,9 +7,9 @@ import DataActions from '../actions/DataActions';
 
 let log = debug('DataStore');
 
-var update = React.addons.update;
+let update = React.addons.update;
 
-var DataStore = Reflux.createStore({
+let DataStore = Reflux.createStore({
 
 	listenables: [DataActions],
 
@@ -19,40 +19,57 @@ var DataStore = Reflux.createStore({
 
 	topics: null,
 
+	firstSync: true,
+
+	lastSyncError: null,
+
+	firstSyncCompleted: false,
+
 	init: function() {
 		this.oauthData = JSON.parse(localStorage.getItem('OAUTH_DATA'));
 		this.lastSyncTime = Number(localStorage.getItem('LAST_SYNC_TIME'));
 		this.topics = JSON.parse(localStorage.getItem('TOPICS')) || {};
+		this.lastSyncError = JSON.parse(localStorage.getItem('LAST_SYNC_ERROR'));
+		this.firstSyncCompleted = JSON.parse(
+				localStorage.getItem('FIRST_SYNC_COMPLETED')
+			) || false;
 	},
 
 	onSignIn: function() {
+		log('sign in started');
 		this.trigger('signin_started');
 	},
 
 	onSignInCompleted: function(oauthData) {
+		log('sign in completed');
 		this.setOauthData(oauthData);
 		this.trigger('signin_completed');
 	},
 
 	onSignInFailed: function(oauthData) {
+		log('sign in failed, with error:', oauthData.error);
 		this.trigger('signin_failed', oauthData.error);
 	},
 
 	onSync: function() {
-		log('Sync started...');
+		log('sync started');
 		this.trigger('sync_started');
 	},
+
 	onSyncAuthorized: function(authData) {
+		log('sync authorized');
 		this.oauthData.expires_at = authData.expires_at;
 		this.setOauthData(this.oauthData);
 		this.trigger('sync_authorized');
 	},
+
 	onSyncCompleted: function(newTopics) {
-		var newTopicsById = {};
+		log('sync completed');
+		let newTopicsById = {};
 
 		newTopics.sort(function(a, b) {
-			var t1 = moment(a.updated_at);
-			var t2 = moment(b.updated_at);
+			let t1 = moment(a.updated_at);
+			let t2 = moment(b.updated_at);
 			return t2.valueOf() - t1.valueOf();
 		});
 
@@ -71,19 +88,25 @@ var DataStore = Reflux.createStore({
 			$merge: newTopicsById
 		});
 
+		// Storing new topics
 		this.storeTopics();
 
-		this.trigger('sync_completed');
+		// Setting flag that initial sync completed
+		if (!this.firstSyncCompleted) {
+			this.firstSyncCompleted = true;
+			localStorage.setItem('FIRST_SYNC_COMPLETED', this.firstSyncCompleted);
+		}
 
-		debug('Sync completed!');
+		// Notifying about sync completion
+		this.trigger('sync_completed');
 	},
 
 	onSyncFailed: function(err) {
+		log('sync failed, with error:', err.message);
 		this.trigger('sync_failed', err.message);
 	},
 
 	onMarkAsSeen: function() {
-
 		// Setting existing topics as seen
 		for (var topicableId in this.topics) {
 			this.topics[topicableId].wasSeen = true;
@@ -98,6 +121,7 @@ var DataStore = Reflux.createStore({
 		// Storing topics
 		localStorage.setItem('TOPICS', JSON.stringify(this.topics));
 	},
+
 	setOauthData: function(oauthData) {
 		this.oauthData = oauthData;
 		localStorage.setItem('OAUTH_DATA', JSON.stringify(oauthData));
@@ -105,6 +129,10 @@ var DataStore = Reflux.createStore({
 
 	getOauthData: function() {
 		return this.oauthData;
+	},
+
+	isFirstSyncCompleted: function() {
+		return this.firstSyncCompleted;
 	},
 
 	isSignedIn: function() {
@@ -116,7 +144,7 @@ var DataStore = Reflux.createStore({
 	},
 
 	getTopics: function() {
-		var topics = [];
+		let topics = [];
 
 		for (var topicableId in this.topics) {
 			topics.push(this.topics[topicableId]);
@@ -133,4 +161,4 @@ var DataStore = Reflux.createStore({
 
 });
 
-module.exports = DataStore;
+export default DataStore;

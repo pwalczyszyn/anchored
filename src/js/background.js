@@ -38,7 +38,7 @@ function popupMessage(msg) {
 
 chrome.runtime.onConnect.addListener(function(_port) {
 
-	if (port.name === 'popup_opened') {
+	if (_port.name === 'popup_opened') {
 
 		// Setting ref to port object
 		port = _port;
@@ -78,7 +78,9 @@ function startSync(_isFirstSync) {
 	}
 }
 
-DataStore.listen(function(status) {
+
+
+DataStore.listen(function(status, errorMessage) {
 	log('DataStore status', status);
 
 	switch (status) {
@@ -86,6 +88,9 @@ DataStore.listen(function(status) {
 
 			// Starting sync
 			startSync(true);
+
+			break;
+		case 'signin_failed':
 
 			break;
 		case 'sync_authorized':
@@ -102,7 +107,7 @@ DataStore.listen(function(status) {
 
 			var topics = DataStore.getTopics();
 			var newCount = topics.filter(function(topic) {
-				return topic.wasSeen;
+				return !topic.wasSeen;
 			}).length;
 
 			chrome.browserAction.setBadgeBackgroundColor({
