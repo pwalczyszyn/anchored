@@ -21,7 +21,7 @@ let DataStore = Reflux.createStore({
 
 	firstSync: true,
 
-	lastSyncError: null,
+	lastError: null,
 
 	firstSyncCompleted: false,
 
@@ -29,10 +29,10 @@ let DataStore = Reflux.createStore({
 		this.oauthData = JSON.parse(localStorage.getItem('OAUTH_DATA'));
 		this.lastSyncTime = Number(localStorage.getItem('LAST_SYNC_TIME'));
 		this.topics = JSON.parse(localStorage.getItem('TOPICS')) || {};
-		this.lastSyncError = JSON.parse(localStorage.getItem('LAST_SYNC_ERROR'));
+		this.lastError = JSON.parse(localStorage.getItem('LAST_ERROR'));
 		this.firstSyncCompleted = JSON.parse(
-				localStorage.getItem('FIRST_SYNC_COMPLETED')
-			) || false;
+			localStorage.getItem('FIRST_SYNC_COMPLETED')
+		) || false;
 	},
 
 	onSignIn: function() {
@@ -47,7 +47,7 @@ let DataStore = Reflux.createStore({
 	},
 
 	onSignInFailed: function(oauthData) {
-		log('sign in failed, with error:', oauthData.error);
+		this.setLastError('Sign in failed, with error: ' + oauthData.error);
 		this.trigger('signin_failed', oauthData.error);
 	},
 
@@ -97,13 +97,16 @@ let DataStore = Reflux.createStore({
 			localStorage.setItem('FIRST_SYNC_COMPLETED', this.firstSyncCompleted);
 		}
 
+		// Setting that there was no error
+		this.setLastError(null);
+
 		// Notifying about sync completion
 		this.trigger('sync_completed');
 	},
 
 	onSyncFailed: function(err) {
-		log('sync failed, with error:', err.message);
-		this.trigger('sync_failed', err.message);
+		this.setLastError('Sync failed, with error: ' + err.message);
+		this.trigger('sync_failed');
 	},
 
 	onMarkAsSeen: function() {
@@ -112,9 +115,28 @@ let DataStore = Reflux.createStore({
 			this.topics[topicableId].wasSeen = true;
 		}
 
+		// Storing updated topics
 		this.storeTopics();
 
+		// Notifying
 		this.trigger('marked_as_seen');
+	},
+
+	setLastError: function(message) {
+		if (message) {
+			log(message);
+			this.lastError = {
+				message: message,
+				time: Date.now()
+			};
+		} else {
+			this.lastError = null;
+		}
+		localStorage.setItem('LAST_ERROR', JSON.stringify(this.lastError));
+	},
+
+	getLastError: function() {
+		return this.lastError;
 	},
 
 	storeTopics: function() {
