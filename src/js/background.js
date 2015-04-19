@@ -28,8 +28,8 @@ function popupClosed() {
 	BackgroundActions.markAsSeen();
 }
 
-function popupMessage(msg) {
-	if (msg.action === 'authBasecamp') {
+function popupMessage(message) {
+	if (message === 'sign_in_basecamp') {
 
 		BackgroundActions.signIn();
 
@@ -50,44 +50,35 @@ chrome.runtime.onConnect.addListener(function(_port) {
 		port.onMessage.addListener(popupMessage);
 
 		// Sending message to popup with current sync status
-		port.postMessage({
-			isFirstSync: isFirstSync,
-			isSyncRunning: isSyncRunning
-		});
+		port.postMessage({state: 'connected', isSyncRunning: isSyncRunning});
 
 	}
 
 });
 
-function startSync(_isFirstSync) {
+function notifyPopup(msg) {
+	if (port) {
+		port.postMessage(msg);
+	}
+}
+
+function startSync() {
 	if (!isSyncRunning) {
-		isFirstSync = _isFirstSync || false;
-		isSyncRunning = true;
 		BackgroundActions.sync(
 			BackgroundStore.getLastSyncTime(),
 			BackgroundStore.getOauthData()
 		);
-
-		if (port) {
-			port.postMessage({
-				isFirstSync: isFirstSync,
-				isSyncRunning: isSyncRunning
-			});
-		}
-
 	}
 }
 
-
-
-BackgroundStore.listen(function(status, errorMessage) {
+BackgroundStore.listen(function(status) {
 	log('BackgroundStore status', status);
 
 	switch (status) {
 		case 'signin_completed':
 
 			// Starting sync
-			startSync(true);
+			startSync();
 
 			break;
 		case 'signin_failed':
@@ -129,12 +120,14 @@ BackgroundStore.listen(function(status, errorMessage) {
 		default:
 
 	}
+
+	notifyPopup(status);
 });
 
 if (BackgroundStore.isSignedIn()) {
 
 	// Starting sync
-	startSync(false);
+	startSync();
 
 	// Startic sync timer
 	timer = setTimeout(function() {

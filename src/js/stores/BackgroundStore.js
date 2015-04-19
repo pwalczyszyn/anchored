@@ -135,10 +135,6 @@ let BackgroundStore = Reflux.createStore({
 		localStorage.setItem('LAST_ERROR', JSON.stringify(this.lastError));
 	},
 
-	getLastError: function() {
-		return this.lastError;
-	},
-
 	storeTopics: function() {
 		// Storing topics
 		localStorage.setItem('TOPICS', JSON.stringify(this.topics));
@@ -151,6 +147,10 @@ let BackgroundStore = Reflux.createStore({
 
 	getOauthData: function() {
 		return this.oauthData;
+	},
+
+	getLastError: function() {
+		return this.lastError;
 	},
 
 	isFirstSyncCompleted: function() {

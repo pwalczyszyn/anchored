@@ -1,13 +1,11 @@
 import React from 'react';
-import BackgroundActions from '../actions/BackgroundActions';
-import bgPort from '../utils/bgport';
+
+import PopupActions from '../actions/PopupActions';
 
 class WelcomeView extends React.Component {
 
   onSignInClick () {
-    bgPort.postMessage({
-      action: 'authBasecamp'
-    });
+    PopupActions.signIn();
   }
 
   onAuthorClick () {

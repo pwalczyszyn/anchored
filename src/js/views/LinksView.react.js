@@ -2,8 +2,8 @@ import React from 'react';
 
 import classNames from 'classnames';
 
-import BackgroundStore from '../stores/BackgroundStore';
-import BackgroundActions from '../actions/BackgroundActions';
+import PopupStore from '../stores/PopupStore';
+import PopupActions from '../actions/PopupActions';
 
 class TopicItemRenderer extends React.Component {
 
@@ -36,7 +36,7 @@ class LinksView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      topics: BackgroundStore.getTopics()
+      topics: PopupStore.getTopics()
     };
   }
 
@@ -44,24 +44,20 @@ class LinksView extends React.Component {
   }
 
   componentDidMount() {
-    BackgroundActions.sync(
-      BackgroundStore.getLastSyncTime(),
-      BackgroundStore.getOauthData()
-    );
-    this.unsubscribe = BackgroundStore.listen(this.onBackgroundStoreChange.bind(this));
+    // this.unsubscribe = PopupStore.listen(this.onPopupStoreChange.bind(this));
   }
 
   componentWillUnmount() {
     this.unsubscribe();
   }
 
-  onBackgroundStoreChange(state) {
+  onPopupStoreChange(state) {
 
     switch (state) {
       case 'sync_completed':
 
         this.setState({
-          topics: BackgroundStore.getTopics()
+          topics: PopupStore.getTopics()
         });
 
         break;

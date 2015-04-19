@@ -7,7 +7,8 @@ import LinksView from './LinksView.react';
 var LoaderView = require('./LoaderView.react');
 var WelcomeView = require('./WelcomeView.react');
 
-var BackgroundStore = require('../stores/BackgroundStore');
+var PopupStore = require('../stores/PopupStore');
+var PopupActions = require('../actions/PopupActions');
 
 var MainView = React.createClass({
 
@@ -15,26 +16,21 @@ var MainView = React.createClass({
 
   getInitialState: function() {
     return {
-      signedIn: BackgroundStore.isSignedIn()
+      signedIn: PopupStore.isSignedIn()
     };
   },
 
   componentDidMount: function() {
-    this.listenTo(BackgroundStore, this.onBackgroundStoreChange);
+    PopupActions.init();
+    this.listenTo(PopupStore, this.onStoreUpdates);
   },
 
-  onBackgroundStoreChange: function (state) {
-    switch (state) {
-      case 'signin_completed':
-
-        this.setState({
-          signedIn: true
-        });
-
-        break;
-      default:
-
-    }
+  onStoreUpdates: function() {
+    this.setState({
+      signedIn: PopupStore.isSignedIn(),
+      isFirstSyncCompleted: PopupStore.isFirstSyncCompleted(),
+      isSyncRunning: PopupStore.isSyncRunning()
+    });
   },
 
   render: function () {
