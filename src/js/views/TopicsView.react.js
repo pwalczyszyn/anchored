@@ -33,18 +33,11 @@ class TopicItemRenderer extends React.Component {
 
 class LinksView extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      topics: PopupStore.getTopics()
-    };
-  }
-
   componentWillMount() {
   }
 
   componentDidMount() {
-    // this.unsubscribe = PopupStore.listen(this.onPopupStoreChange.bind(this));
+    this.unsubscribe = PopupStore.listen(this.onPopupStoreChange.bind(this));
   }
 
   componentWillUnmount() {
@@ -52,25 +45,27 @@ class LinksView extends React.Component {
   }
 
   onPopupStoreChange(state) {
+    this.setState({
+      isFirstSyncCompleted: PopupStore.isFirstSyncCompleted(),
+      isSyncRunning: PopupStore.isSyncRunning()
+    });
+  }
 
-    switch (state) {
-      case 'sync_completed':
-
-        this.setState({
-          topics: PopupStore.getTopics()
-        });
-
-        break;
-      default:
-    }
-
+  onSyncClick() {
+    PopupActions.sync();
   }
 
   render() {
-    let topics = this.state.topics;
+    let topics = PopupStore.getTopics();
     return (
       <div className="topics-view">
         <h4>Latest activity</h4>
+        <div className="topics-buttons-bar">
+          <button className="topics-buttons-bar__button"
+                  onClick={this.onSyncClick}>
+            <span className="icon-refresh"></span>
+          </button>
+        </div>
         <ul className="topics-list">
           {
             topics.map(function (topic) {
@@ -81,6 +76,7 @@ class LinksView extends React.Component {
       </div>
     );
   }
+
 }
 
 export default LinksView;

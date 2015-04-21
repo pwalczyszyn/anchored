@@ -11,7 +11,9 @@ let PopupActions = Reflux.createActions({
 	signIn: {},
 
 	backgroundMessage: {
-	}
+	},
+
+	sync: {}
 
 });
 
@@ -31,6 +33,10 @@ PopupActions.init.listen(function() {
 
 PopupActions.signIn.listen(function() {
 	port.postMessage('sign_in_basecamp');
+});
+
+PopupActions.sync.listen(function() {
+	port.postMessage('sync');
 });
 
 export default PopupActions;

@@ -28,10 +28,31 @@ function popupClosed() {
 	BackgroundActions.markAsSeen();
 }
 
-function popupMessage(message) {
-	if (message === 'sign_in_basecamp') {
+function startSync() {
+	if (!isSyncRunning && BackgroundStore.isSignedIn()) {
 
-		BackgroundActions.signIn();
+		isSyncRunning = true;
+
+		BackgroundActions.sync(
+			BackgroundStore.getLastSyncTime(),
+			BackgroundStore.getOauthData()
+		);
+	}
+}
+
+function popupMessage(message) {
+	switch (message) {
+		case 'sign_in_basecamp':
+
+			BackgroundActions.signIn();
+
+			break;
+		case 'sync':
+
+			startSync();
+
+			break;
+		default:
 
 	}
 }
@@ -49,6 +70,9 @@ chrome.runtime.onConnect.addListener(function(_port) {
 		// Listen to popup messages
 		port.onMessage.addListener(popupMessage);
 
+		// Starting sync
+		startSync();
+
 		// Sending message to popup with current sync status
 		port.postMessage({state: 'connected', isSyncRunning: isSyncRunning});
 
@@ -59,15 +83,6 @@ chrome.runtime.onConnect.addListener(function(_port) {
 function notifyPopup(msg) {
 	if (port) {
 		port.postMessage(msg);
-	}
-}
-
-function startSync() {
-	if (!isSyncRunning) {
-		BackgroundActions.sync(
-			BackgroundStore.getLastSyncTime(),
-			BackgroundStore.getOauthData()
-		);
 	}
 }
 
@@ -96,6 +111,8 @@ BackgroundStore.listen(function(status) {
 			break;
 		case 'sync_completed':
 
+			isSyncRunning = false;
+
 			var topics = BackgroundStore.getTopics();
 			var newCount = topics.filter(function(topic) {
 				return !topic.wasSeen;
@@ -111,6 +128,8 @@ BackgroundStore.listen(function(status) {
 
 			break;
 		case 'sync_failed':
+
+			isSyncRunning = false;
 
 			chrome.browserAction.setBadgeText({
 				text: ''

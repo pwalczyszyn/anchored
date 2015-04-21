@@ -1,43 +1,50 @@
-var React = require('react');
-var Reflux = require('reflux');
+import React from 'react';
+import Reflux from 'reflux';
 
-// var LinksView = require('./LinksView.react');
-import LinksView from './LinksView.react';
+import TopicsView from './TopicsView.react';
+import SignInView from './SignInView.react';
+import StatusBar from './StatusBar.react';
 
-var LoaderView = require('./LoaderView.react');
-var WelcomeView = require('./WelcomeView.react');
+import PopupStore from '../stores/PopupStore';
+import PopupActions from '../actions/PopupActions';
 
-var PopupStore = require('../stores/PopupStore');
-var PopupActions = require('../actions/PopupActions');
+class MainView extends React.Component {
 
-var MainView = React.createClass({
-
-  mixins: [Reflux.ListenerMixin],
-
-  getInitialState: function() {
-    return {
+  constructor(props) {
+    super(props);
+    this.state = {
       signedIn: PopupStore.isSignedIn()
     };
-  },
+  }
 
-  componentDidMount: function() {
+  componentDidMount() {
     PopupActions.init();
-    this.listenTo(PopupStore, this.onStoreUpdates);
-  },
+    this.unsubscribe = PopupStore.listen(this.onPopupStoreChange.bind(this));
+  }
 
-  onStoreUpdates: function() {
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  onPopupStoreChange() {
     this.setState({
       signedIn: PopupStore.isSignedIn(),
       isFirstSyncCompleted: PopupStore.isFirstSyncCompleted(),
       isSyncRunning: PopupStore.isSyncRunning()
     });
-  },
+  }
 
-  render: function () {
+  render() {
     return (
-      !this.state.signedIn ? <WelcomeView/> : <LinksView/>
+      <div>
+
+        {!this.state.signedIn ? <SignInView/> : <TopicsView/>}
+
+        <StatusBar/>
+      </div>
     );
   }
-});
 
-module.exports = MainView;
+}
+
+export default MainView;

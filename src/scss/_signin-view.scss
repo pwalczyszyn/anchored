@@ -1,4 +1,4 @@
-.welcome-view {
+.signin-view {
   position: absolute;
   display: flex;
   width: 100%;
@@ -32,10 +32,10 @@
   }
 }
 
-.welcome-logo {
+.signin-logo {
   font-size: 96px;
 }
-.welcome-button {
+.signin-button {
   &__img {
     width: 22px;
     vertical-align: middle;
