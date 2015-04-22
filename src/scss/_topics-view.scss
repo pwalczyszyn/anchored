@@ -1,10 +1,24 @@
 .topics-view {
-  position: relative;
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  &__title {
+    margin: 10px 0 0;
+    padding-left: 10px;
+    color: #8E8E8E;
+    text-transform: uppercase;
+  }
+
+  &.syncing {
+
+  }
 }
 
 .topics-buttons-bar {
   position: absolute;
-  top: 0;
+  top: 7px;
   right: 10px;
 
   &__button {
@@ -18,10 +32,28 @@
     &:active {
       background-color: rgba(0,0,0,0.2);
     }
+
+    &.syncing {
+      & > .icon-refresh {
+        animation: spin 2s linear infinite;
+      }
+    }
+
+    transform: rotate(0deg);
   }
 }
 
+@keyframes spin { 100% { transform:rotate(360deg); } }
+
+
 .topics-list {
+
+  position: absolute;
+
+  top: 30px;
+  bottom: 0;
+  width: 100%;
+  overflow: scroll;
 
   padding: 0;
   margin: 10px 10px 0 0;
@@ -30,10 +62,7 @@
     position: relative;
 
     margin-top: 1px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-
-    padding-left: 10px;
+    padding: 5px 10px;
 
     &-seen {
       &:before {
@@ -55,11 +84,15 @@
     text-decoration: none;
     color: #4886BA;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     outline: none;
+
+    &--opened {
+      font-weight: lighter;
+    }
   }
 
   &__excerpt {
@@ -73,5 +106,23 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+  }
+
+  &-enter {
+    opacity: 0.01;
+    transition: opacity .5s ease-in;
+  }
+
+  &-enter.topics-list-enter-active {
+    opacity: 1;
+  }
+
+  &-leave {
+    opacity: 1;
+    transition: opacity .5s ease-in;
+  }
+
+  &-leave.topics-list-leave-active {
+    opacity: 0.01;
   }
 }

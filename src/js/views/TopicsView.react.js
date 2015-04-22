@@ -1,25 +1,30 @@
-import React from 'react';
+import React from 'react/addons';
 
 import classNames from 'classnames';
 
 import PopupStore from '../stores/PopupStore';
 import PopupActions from '../actions/PopupActions';
 
+let ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
 class TopicItemRenderer extends React.Component {
 
   onTopicClick() {
-    chrome.tabs.create({
-      url: this.props.topic.topicable.app_url
-    });
-    this.props.topic.wasOpened = true;
+    PopupActions.openTopic(this.props.topic);
   }
 
   render() {
     let topic = this.props.topic;
+    let listClasses = classNames('topics-list__item', {
+      'topics-list__item-seen': !topic.wasSeen
+    });
+    let linkClasses = classNames('topics-list__link', {
+      'topics-list__link--opened': topic.wasOpened
+    });
     return (
-      <li className={classNames('topics-list__item', {'topics-list__item-seen': !topic.wasSeen})}>
+      <li className={listClasses}>
         <a href={topic.topicable.app_url}
-           className="topics-list__link"
+           className={linkClasses}
            onClick={this.onTopicClick.bind(this)}>
           {topic.title}
         </a>
@@ -32,6 +37,13 @@ class TopicItemRenderer extends React.Component {
 }
 
 class LinksView extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isSyncRunning: PopupStore.isSyncRunning()
+    };
+  }
 
   componentWillMount() {
   }
@@ -46,7 +58,6 @@ class LinksView extends React.Component {
 
   onPopupStoreChange(state) {
     this.setState({
-      isFirstSyncCompleted: PopupStore.isFirstSyncCompleted(),
       isSyncRunning: PopupStore.isSyncRunning()
     });
   }
@@ -57,22 +68,34 @@ class LinksView extends React.Component {
 
   render() {
     let topics = PopupStore.getTopics();
+
+    let viewClasses = classNames('topics-view', {
+      'syncing': this.state.isSyncRunning
+    });
+
+    let syncBtnClasses = classNames('topics-buttons-bar__button', {
+      'syncing': this.state.isSyncRunning
+    });
+
     return (
-      <div className="topics-view">
-        <h4>Latest activity</h4>
+      <div className={viewClasses}>
+        <h4 className="topics-view__title">Latest activity</h4>
         <div className="topics-buttons-bar">
-          <button className="topics-buttons-bar__button"
-                  onClick={this.onSyncClick}>
+          <button className={syncBtnClasses}
+                  onClick={this.onSyncClick}
+                  disabled={this.state.isSyncRunning}>
             <span className="icon-refresh"></span>
           </button>
         </div>
-        <ul className="topics-list">
+        <ReactCSSTransitionGroup transitionName="topics-list"
+                                 component="ul"
+                                 className="topics-list">
           {
             topics.map(function (topic) {
               return (<TopicItemRenderer key={topic.topicable_id} topic={topic} />);
             })
           }
-        </ul>
+        </ReactCSSTransitionGroup>
       </div>
     );
   }

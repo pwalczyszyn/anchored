@@ -14,7 +14,8 @@ const BackgroundActions = Reflux.createActions({
 		asyncResult: true,
 		children: ['authorized']
 	},
-	markAsSeen: {}
+	markAsSeen: {},
+	markOpened: {}
 });
 
 BackgroundActions.signIn.listen(function() {

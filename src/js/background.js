@@ -41,7 +41,7 @@ function startSync() {
 }
 
 function popupMessage(message) {
-	switch (message) {
+	switch (message.name) {
 		case 'sign_in_basecamp':
 
 			BackgroundActions.signIn();
@@ -52,6 +52,10 @@ function popupMessage(message) {
 			startSync();
 
 			break;
+		case 'topic_opened':
+
+		BackgroundActions.markOpened(message.topicId);
+
 		default:
 
 	}

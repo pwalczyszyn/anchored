@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 class StatusBar extends React.Component {
 
@@ -7,11 +8,10 @@ class StatusBar extends React.Component {
   }
 
   render() {
-    return (<div className="status-bar">
-
-
-
-    </div>);
+		var classes = classNames('status-bar', {
+			info: this.props.type === 'info'
+		});
+    return (<div className={classes}>{this.props.message}</div>);
   }
 
 }

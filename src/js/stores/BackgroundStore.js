@@ -122,6 +122,15 @@ let BackgroundStore = Reflux.createStore({
 		this.trigger('marked_as_seen');
 	},
 
+	onMarkOpened: function(topicId) {
+		var topic = this.topics[topicId];
+		if (topic) {
+			topic.wasOpened = true;
+		}
+		// Storing updated topics
+		this.storeTopics();		
+	},
+
 	setLastError: function(message) {
 		if (message) {
 			log(message);

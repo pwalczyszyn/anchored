@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react/addons';
 import Reflux from 'reflux';
 
 import TopicsView from './TopicsView.react';
@@ -7,6 +7,8 @@ import StatusBar from './StatusBar.react';
 
 import PopupStore from '../stores/PopupStore';
 import PopupActions from '../actions/PopupActions';
+
+let ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 class MainView extends React.Component {
 
@@ -35,12 +37,17 @@ class MainView extends React.Component {
   }
 
   render() {
+    var statusBarProps = {
+      type: 'info',
+      message: (!this.state.isFirstSyncCompleted ? 'First sync, please be patient ;)' :
+        (this.state.isSyncRunning ? 'Synchronizaing topics...' : null))
+    };
     return (
       <div>
-
         {!this.state.signedIn ? <SignInView/> : <TopicsView/>}
-
-        <StatusBar/>
+        <ReactCSSTransitionGroup transitionName="status-bar">
+          {this.state.isSyncRunning ? <StatusBar {...statusBarProps}/> : null}
+        </ReactCSSTransitionGroup>
       </div>
     );
   }
